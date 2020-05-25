@@ -1,5 +1,7 @@
 import React from 'react'
 import { View, Text, StyleSheet, ScrollView, Button, Alert, Image } from 'react-native'
+import { HeaderButtons, Item } from 'react-navigation-header-buttons'
+import { AppHeaderIcon } from '../components/AppHeaderIcon'
 import { DATA } from '../data'
 import { THEME } from '../theme'
 
@@ -37,9 +39,20 @@ export const PostScreen = ({navigation, route}) => {
 
 PostScreen.navigationOptions = ({navigation}) => {
     const date = navigation.getParam('date')
+    const booked = navigation.getParam('booked')
+    const iconName =  booked ? 'ios-star' : 'ios-star-outline'
     
     return {
-        headerTitle: 'Posted ' + new Date(date).toLocaleDateString()
+        headerTitle: 'Posted ' + new Date(date).toLocaleDateString(),
+        headerRight: (
+            <HeaderButtons HeaderButtonComponent={AppHeaderIcon} >
+                <Item 
+                    title="Hangle bookmarked"
+                    iconName={iconName}
+                    onPress={() => console.log('Booked pressed')}
+                />
+            </HeaderButtons>
+        )
     }
 }
 
