@@ -3,11 +3,14 @@ import { createAppContainer } from 'react-navigation'
 import { createStackNavigator } from 'react-navigation-stack'
 import { createBottomTabNavigator } from 'react-navigation-tabs'
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs'
+import { createDrawerNavigator } from 'react-navigation-drawer'
 import { Platform } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 
 import { MainScreen } from '../screens/MainScreen'
 import { PostScreen } from '../screens/PostScreen'
+import { AboutScreen } from '../screens/AboutScreen'
+import { CreateScreen } from '../screens/CreateScreen'
 import { BookedScreen } from '../screens/BookedScreen'
 import { THEME } from '../theme'
 
@@ -61,4 +64,44 @@ const BottomNavigator = Platform.OS === 'android'
     }
 })
 
-export const AppNavigation = createAppContainer(BottomNavigator)
+const AboutNavigator = createStackNavigator({
+    About: AboutScreen
+}, navigatorOptions)
+
+const CreateNavigator = createStackNavigator({
+    Create: CreateScreen
+}, navigatorOptions)
+
+const MainNavigator = createDrawerNavigator({
+    PostTabs: {
+        screen: BottomNavigator, 
+        navigationOptions: {
+            drawerLabel: 'Main',
+            drawerIcon: ({ tintColor }) => <Ionicons name="md-home" size={25} color={tintColor} />
+        }
+    },
+    About: {
+        screen: AboutNavigator,
+        navigationOptions: {
+            drawerLabel: 'About app',
+            drawerIcon: ({ tintColor }) => <Ionicons name="md-information-circle" size={25} color={tintColor} />
+        }
+    },
+    Create: {
+        screen: CreateNavigator,
+        navigationOptions: {
+            drawerLabel: 'Create post',
+            drawerIcon: ({ tintColor }) => <Ionicons name="ios-color-palette" size={25} color={tintColor} />
+        }
+    }
+}, {
+    contentOptions: {
+        activeTintColor: THEME.MAIN_COLOR,
+        inactiveTintColor: '#555',
+        labelStyle: {
+            fontFamily: 'open-bold'
+        }
+    }
+})
+
+export const AppNavigation = createAppContainer(MainNavigator)

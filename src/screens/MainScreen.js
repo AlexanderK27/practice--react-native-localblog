@@ -4,7 +4,7 @@ import { DATA } from '../data'
 import { AppHeaderIcon } from '../components/AppHeaderIcon'
 import { PostList } from '../components/PostList'
 
-export const MainScreen = ({navigation}) => {
+export const MainScreen = ({ navigation }) => {
     const openPostHandler = post => {
         navigation.navigate('Post', { postId: post.id, date: post.date, booked: post.booked })
     }
@@ -12,14 +12,14 @@ export const MainScreen = ({navigation}) => {
     return <PostList data={DATA} onOpen={openPostHandler} />
 }
 
-MainScreen.navigationOptions = {
+MainScreen.navigationOptions = ({ navigation }) => ({
     headerTitle: 'My blog',
     headerRight: (
         <HeaderButtons HeaderButtonComponent={AppHeaderIcon} >
             <Item 
-                title="Take photo"
+                title="Go to create screen"
                 iconName="ios-camera"
-                onPress={() => console.log('Camera pressed')}
+                onPress={() => navigation.push('Create')}
             />
         </HeaderButtons>
     ),
@@ -28,8 +28,8 @@ MainScreen.navigationOptions = {
             <Item 
                 title="Toggle Drawer"
                 iconName="ios-menu"
-                onPress={() => console.log('Menu pressed')}
+                onPress={() => navigation.toggleDrawer()}
             />
         </HeaderButtons>
     )
-}
+})
