@@ -1,14 +1,35 @@
-import React from 'react'
+import React, { useEffect, useCallback } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { View, Text, StyleSheet, ScrollView, Button, Alert, Image } from 'react-native'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
 import { AppHeaderIcon } from '../components/AppHeaderIcon'
-import { DATA } from '../data'
+import { toggleBooked, deletePost } from '../store/actions/post'
 import { THEME } from '../theme'
 
-export const PostScreen = ({navigation, route}) => {
+export const PostScreen = ({ navigation }) => {
+    const dispatch = useDispatch()
     const postId = navigation.getParam('postId')
+    const post = useSelector(state => state.post.allPosts.find(post => post.id === postId))
 
-    const post = DATA.find(p => p.id === postId)
+    // start('handle bookmarked') // passing data to navifationOptions below
+    const booked = useSelector(state => 
+        state.post.bookedPosts.some(post => post.id === postId)    
+    )
+
+    useEffect(() => {
+        navigation.setParams({ booked })
+    }, [booked])
+
+    const toggleHandler = useCallback(() => {
+        dispatch(toggleBooked(postId))
+    }, [dispatch, postId])
+
+    useEffect(() => {
+        navigation.setParams({ toggleHandler })
+    }, [toggleHandler])
+
+    // end('handle bookmarked')
+
 
     const deleteHandler = () => {
         Alert.alert(
@@ -16,9 +37,20 @@ export const PostScreen = ({navigation, route}) => {
             'Are you sure you want to delete this post?',
             [
                 { text: 'Cancel', style: 'cancel' },
-                { text: 'Delete', style: 'destructive', onPress: () => {} }
+                { text: 'Delete', style: 'destructive', onPress: () => {
+                    navigation.navigate('Main')
+                    dispatch(deletePost(postId))
+                } }
             ],
             {cancelable: true}
+        )
+    }
+
+    if (!post) {
+        return (
+            <View style={styles.deleted}>
+                <Text>This post has been deleted</Text>
+            </View>
         )
     }
 
@@ -40,6 +72,7 @@ export const PostScreen = ({navigation, route}) => {
 PostScreen.navigationOptions = ({navigation}) => {
     const date = navigation.getParam('date')
     const booked = navigation.getParam('booked')
+    const toggleHandler = navigation.getParam('toggleHandler')
     const iconName =  booked ? 'ios-star' : 'ios-star-outline'
     
     return {
@@ -49,7 +82,7 @@ PostScreen.navigationOptions = ({navigation}) => {
                 <Item 
                     title="Hangle bookmarked"
                     iconName={iconName}
-                    onPress={() => console.log('Booked pressed')}
+                    onPress={toggleHandler}
                 />
             </HeaderButtons>
         )
@@ -66,5 +99,10 @@ const styles = StyleSheet.create({
     },
     title: {
         fontFamily: 'open-regular'
+    },
+    deleted: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 })
