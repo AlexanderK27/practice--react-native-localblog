@@ -1,23 +1,27 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { View, Text, StyleSheet, TextInput, Button, Image, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
 import { addPost } from '../store/actions/post'
 import { AppHeaderIcon } from '../components/AppHeaderIcon'
 import { THEME } from '../theme'
+import { PhotoPicker } from '../components/PhotoPicker'
 
 
 export const CreateScreen = ({ navigation }) => {
     const dispatch = useDispatch()
     const [text, setText] = useState('')
+    const imgRef = useRef()
 
-    const img = 'https://cdn.londonandpartners.com/visit/general-london/areas/river/76709-640x360-houses-of-parliament-and-london-eye-on-thames-from-above-640.jpg'
+    const pickPhotoHandler = uri => {
+        imgRef.current = uri
+    }
 
     const saveHandler = () => {
         const post = {
             date: new Date().toJSON(),
             text,
-            img,
+            img: imgRef.current,
             booked: false
         }
 
@@ -38,14 +42,12 @@ export const CreateScreen = ({ navigation }) => {
                         onChangeText={setText}
                         multiline
                     />
-                    <Image 
-                        style={{ width: '100%', height: 200, marginBottom: 10 }}
-                        source={{ uri: img }}
-                    />
+                    <PhotoPicker onPick={pickPhotoHandler} />
                     <Button 
                         title="Create"
                         color={THEME.MAIN_COLOR}
                         onPress={saveHandler}
+                        disabled={!text.trim()}
                     />
                 </View>
             </TouchableWithoutFeedback>
